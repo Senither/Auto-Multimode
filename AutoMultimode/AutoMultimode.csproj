@@ -10,11 +10,4 @@
     <IsPackable>false</IsPackable>
     <RootNamespace>SamplePlugin</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
 </Project>
