@@ -22,8 +22,14 @@ public sealed class AutoMultimode : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new(PluginName);
     private InformationWindow InformationWindow { get; init; }
 
-    public AutoMultimode()
+    private FrameworkListener FrameworkListener { get; init; }
+
+    public AutoMultimode(IDalamudPluginInterface pluginInterface)
     {
+        Service.Initialize(pluginInterface);
+
+        FrameworkListener = new();
+
         InformationWindow = new InformationWindow();
         WindowSystem.AddWindow(InformationWindow);
 
@@ -32,6 +38,8 @@ public sealed class AutoMultimode : IDalamudPlugin
             HelpMessage = "Displays some information about the plugin.",
             ShowInHelp = true,
         });
+
+        Service.Framework.Update += FrameworkListener.OnFrameworkUpdate;
 
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
