@@ -2,11 +2,11 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using AutoMultimode.Windows;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using SamplePlugin.Windows;
 
-namespace SamplePlugin;
+namespace AutoMultimode;
 
 public sealed class AutoMultimode : IDalamudPlugin
 {

@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 
-namespace SamplePlugin;
+namespace AutoMultimode;
 
 public class FrameworkListener
 {
