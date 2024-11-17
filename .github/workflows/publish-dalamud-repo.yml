@@ -1,0 +1,45 @@
+name: Publish json from Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+
+    - name: Get release information
+      id: get_release
+      run: |
+        echo "Fetching release information..."
+        curl -sL \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.event.release.tag_name }} > release.json
+
+    - name: Extract AutoMultimode.json download URL
+      id: extract_url
+      run: |
+        asset_url=$(jq -r '.assets[] | select(.name=="AutoMultimode.json") | .browser_download_url' release.json)
+        echo "automultimode_json_url=${asset_url}" >> $GITHUB_ENV
+
+    - name: Download AutoMultimode.json
+      run: |
+        curl -L -o AutoMultimode.json "$automultimode_json_url"
+
+    - name: Commit AutoMultimode.json to the repo
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: 'Update AutoMultimode.json from release ${{ github.event.release.tag_name }}'
+        branch: main
+        file_pattern: 'AutoMultimode.json'
