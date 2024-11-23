@@ -5,6 +5,7 @@ using System.IO;
 using AutoMultimode.Windows;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
+using ECommons;
 
 namespace AutoMultimode;
 
@@ -29,6 +30,8 @@ public sealed class AutoMultimode : IDalamudPlugin
 
     public AutoMultimode(IDalamudPluginInterface pluginInterface)
     {
+        ECommonsMain.Init(pluginInterface, this);
+
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         Service.Initialize(pluginInterface);
@@ -58,6 +61,8 @@ public sealed class AutoMultimode : IDalamudPlugin
     {
         WindowSystem.RemoveAllWindows();
         InformationWindow.Dispose();
+
+        ECommonsMain.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
     }
