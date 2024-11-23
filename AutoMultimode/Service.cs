@@ -38,4 +38,15 @@ public class Service
         LogMessages.Enqueue(message);
         PluginLog.Debug(message);
     }
+
+    public static void PrintError(string message)
+    {
+        if (LogMessages.Count >= MaxLogSize)
+        {
+            LogMessages.Dequeue();
+        }
+
+        LogMessages.Enqueue(message);
+        PluginLog.Error(message);
+    }
 }

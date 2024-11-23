@@ -2,10 +2,12 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using AutoMultimode.IPC;
 using AutoMultimode.Windows;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ECommons;
+using ECommons.EzIpcManager;
 
 namespace AutoMultimode;
 
@@ -30,13 +32,13 @@ public sealed class AutoMultimode : IDalamudPlugin
 
     public AutoMultimode(IDalamudPluginInterface pluginInterface)
     {
-        ECommonsMain.Init(pluginInterface, this);
+        ECommonsMain.Init(pluginInterface, this, Module.DalamudReflector);
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         Service.Initialize(pluginInterface);
 
-        FrameworkListener = new();
+        FrameworkListener = new(this);
 
         ConfigWindow = new ConfigWindow(this);
         InformationWindow = new InformationWindow();
