@@ -33,7 +33,7 @@ public class FrameworkListener
         var playerStatus = player.OnlineStatus.Value.RowId;
         if (playerStatus != lastPlayerStatus && playerStatus == 17) // 17 represents the player being AFK
         {
-            EnableAutoRetainerMultimode();
+            EnableAutoRetainerMultiMode();
         }
 
         lastPlayerStatus = playerStatus;
@@ -44,33 +44,34 @@ public class FrameworkListener
             return;
         }
 
+        var unixNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         if (AutoRetainerIPC.IsBusy.Invoke())
         {
             // Adds the current UTC unix timestamp to the enforcement update state, with an additional five minutes.
-            enforceUpdateStateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 5);
+            enforceUpdateStateAt = unixNow + Configuration.GetEnforcedAfkTimerInSeconds();
             return;
         }
 
-        if (enforceUpdateStateAt <= DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+        if (enforceUpdateStateAt <= unixNow)
         {
             // Sets the enforce update state to the current UTC unix timestamp + 15 minutes, so we don't spam enable
             // the option if AutoRetainer is not ready to collection retainers, and multi mode is just gonna be idle.
-            enforceUpdateStateAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 15);
+            enforceUpdateStateAt = unixNow + (60 * 15);
             Service.GameConfig.Set(SystemConfigOption.AutoAfkSwitchingTime, Configuration.EnforcedAfkTimer);
         }
     }
 
-    protected unsafe void EnableAutoRetainerMultimode()
+    protected static void EnableAutoRetainerMultiMode()
     {
         if (AutoRetainerIPC.IsBusy.Invoke())
         {
             Service.PrintDebug(
-                "Attempted to enable AutoRetainer Multimode due to player state being AFK but AutoRetainer is busy"
+                "Attempted to enable AutoRetainer MultiMode due to player state being AFK but AutoRetainer is busy"
             );
             return;
         }
 
-        Service.PrintDebug("Enabling AutoRetainer Multimode due to player state being AFK");
+        Service.PrintDebug("Enabling AutoRetainer MultiMode due to player state being AFK");
         AutoRetainerIPC.EnableMultiMode.Invoke();
     }
 }
