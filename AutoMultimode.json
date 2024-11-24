@@ -1,16 +1,16 @@
 {
   "Author": "Senither",
-  "Name": "Auto Multimode",
+  "Name": "Auto MultiMode",
   "InternalName": "AutoMultimode",
-  "AssemblyVersion": "0.1.0.0",
+  "AssemblyVersion": "0.2.0.0",
   "Description": "Automatically enables Auto Retainer's multi mode after awhile of inactivity, you can change the settings using /automultimode.",
   "ApplicableVersion": "any",
   "Tags": [
-    "sample",
-    "plugin",
-    "goats"
+    "auto",
+    "retainer",
+    "multimode"
   ],
-  "DalamudApiLevel": 11,
+  "DalamudApiLevel": 10,
   "LoadRequiredState": 0,
   "LoadSync": false,
   "CanUnloadAsync": false,
