@@ -14,11 +14,10 @@ public class ConfigWindow : Window, IDisposable
     public ConfigWindow(AutoMultimode plugin) : base("AutoMultimode Settings###settings-window")
     {
         Flags = ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoCollapse |
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
-        Size = new Vector2(450, 180);
-        SizeCondition = ImGuiCond.Always;
+
+        Size = new Vector2(460, 140);
 
         Configuration = plugin.Configuration;
     }
@@ -28,9 +27,7 @@ public class ConfigWindow : Window, IDisposable
     public override void Draw()
     {
         ImGui.TextWrapped(
-            "AutoRetainer will automatically disable the \"Auto AFK settings\", this will prevent your" +
-            "character from going AFK which causes AutoMultimode to not work, to fix this you can set" +
-            "the AFK timer you'd like to be enforced while AutoRetainer is not enabled."
+            "Set the time that should elapse without player activity before your character is marked as AFK and MultiMode is enabled."
         );
 
         var afkTimer = (int)Configuration.EnforcedAfkTimer;
