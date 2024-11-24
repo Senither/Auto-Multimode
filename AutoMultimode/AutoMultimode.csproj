@@ -6,7 +6,7 @@
         <Authors>Senither</Authors>
         <PlatformTarget>x64</PlatformTarget>
         <Platforms>AnyCPU</Platforms>
-        <Version>0.2.0</Version>
+        <Version>0.3.0</Version>
         <Nullable>enable</Nullable>
         <DalamudLibPath>$(AppData)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
