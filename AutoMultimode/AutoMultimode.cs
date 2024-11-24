@@ -41,7 +41,7 @@ public sealed class AutoMultimode : IDalamudPlugin
         FrameworkListener = new(this);
 
         ConfigWindow = new ConfigWindow(this);
-        InformationWindow = new InformationWindow();
+        InformationWindow = new InformationWindow(this);
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(InformationWindow);
