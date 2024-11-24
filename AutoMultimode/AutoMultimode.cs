@@ -21,8 +21,10 @@ public sealed class AutoMultimode : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new(PluginName);
 
     public readonly Configuration Configuration;
+    public readonly CommandHandler CommandHandler;
 
-    private const string CommandName = "/automultimode";
+    private const string CommandNameLong = "/automultimode";
+    private const string CommandNameShort = "/amm";
     private const string PluginName = "Auto Multimode";
 
     public readonly string Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
@@ -36,6 +38,7 @@ public sealed class AutoMultimode : IDalamudPlugin
         ECommonsMain.Init(pluginInterface, this, Module.DalamudReflector);
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        CommandHandler = new CommandHandler(this);
 
         Service.Initialize(pluginInterface);
 
@@ -47,10 +50,15 @@ public sealed class AutoMultimode : IDalamudPlugin
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(InformationWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(CommandNameLong, new CommandInfo(OnCommand)
         {
             HelpMessage = "Displays some information about the plugin.",
             ShowInHelp = true,
+        });
+
+        CommandManager.AddHandler(CommandNameShort, new CommandInfo(OnCommand)
+        {
+            ShowInHelp = false,
         });
 
         Service.Framework.Update += FrameworkListener.OnFrameworkUpdate;
@@ -67,12 +75,13 @@ public sealed class AutoMultimode : IDalamudPlugin
 
         ECommonsMain.Dispose();
 
-        CommandManager.RemoveHandler(CommandName);
+        CommandManager.RemoveHandler(CommandNameLong);
+        CommandManager.RemoveHandler(CommandNameShort);
     }
 
     private void OnCommand(string command, string args)
     {
-        ToggleMainUI();
+        CommandHandler.HandleCommand(args.Split(' '));
     }
 
     private void DrawUI() => WindowSystem.Draw();
