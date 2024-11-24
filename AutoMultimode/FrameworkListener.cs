@@ -10,9 +10,8 @@ namespace AutoMultimode;
 
 public class FrameworkListener
 {
-    private Configuration Configuration;
+    protected Configuration Configuration;
 
-    private uint lastPlayerStatus = 0;
     private long enforceUpdateStateAt = 0;
 
     public FrameworkListener(AutoMultimode plugin)
@@ -27,42 +26,28 @@ public class FrameworkListener
             return;
         }
 
+        HandleEnablingAutoRetainerMultiMode();
+        HandleEnablingAutoAfkSwitchingTimerSetting();
+    }
+
+    protected void HandleEnablingAutoRetainerMultiMode()
+    {
         var player = Service.ClientState.LocalPlayer;
         if (player == null) return;
 
         var playerStatus = player.OnlineStatus.Value.RowId;
-        if (playerStatus != lastPlayerStatus && playerStatus == 17) // 17 represents the player being AFK
-        {
-            EnableAutoRetainerMultiMode();
-        }
 
-        lastPlayerStatus = playerStatus;
-
-        Service.GameConfig.TryGet(SystemConfigOption.AutoAfkSwitchingTime, out uint afkTime);
-        if (afkTime != 0)
+        // Player status of 17 represents the player being AFK
+        if (playerStatus != 17)
         {
             return;
         }
 
-        var unixNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        if (AutoRetainerIPC.IsBusy.Invoke())
+        if (AutoRetainerIPC.GetMultiModeStatus.Invoke())
         {
-            // Adds the current UTC unix timestamp to the enforcement update state, with an additional five minutes.
-            enforceUpdateStateAt = unixNow + Configuration.GetEnforcedAfkTimerInSeconds();
             return;
         }
 
-        if (enforceUpdateStateAt <= unixNow)
-        {
-            // Sets the enforce update state to the current UTC unix timestamp + 15 minutes, so we don't spam enable
-            // the option if AutoRetainer is not ready to collection retainers, and multi mode is just gonna be idle.
-            enforceUpdateStateAt = unixNow + (60 * 15);
-            Service.GameConfig.Set(SystemConfigOption.AutoAfkSwitchingTime, Configuration.EnforcedAfkTimer);
-        }
-    }
-
-    protected static void EnableAutoRetainerMultiMode()
-    {
         if (AutoRetainerIPC.IsBusy.Invoke())
         {
             Service.PrintDebug(
@@ -72,6 +57,46 @@ public class FrameworkListener
         }
 
         Service.PrintDebug("Enabling AutoRetainer MultiMode due to player state being AFK");
+        Service.GameConfig.Set(
+            option: SystemConfigOption.AutoAfkSwitchingTime,
+            value: 0
+        );
         AutoRetainerIPC.EnableMultiMode.Invoke();
+    }
+
+    protected void HandleEnablingAutoAfkSwitchingTimerSetting()
+    {
+        if (!Service.ClientState.IsLoggedIn)
+        {
+            return;
+        }
+
+        Service.GameConfig.TryGet(SystemConfigOption.AutoAfkSwitchingTime, out uint afkTime);
+        if (afkTime == Configuration.EnforcedAfkTimer)
+        {
+            return;
+        }
+
+        if (AutoRetainerIPC.GetMultiModeStatus.Invoke())
+        {
+            return;
+        }
+
+        var unixNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        if (AutoRetainerIPC.IsBusy.Invoke())
+        {
+            enforceUpdateStateAt = unixNow + 1;
+            return;
+        }
+
+        if (enforceUpdateStateAt > unixNow)
+        {
+            return;
+        }
+
+        Service.GameConfig.Set(
+            option: SystemConfigOption.AutoAfkSwitchingTime,
+            value: Configuration.EnforcedAfkTimer
+        );
     }
 }

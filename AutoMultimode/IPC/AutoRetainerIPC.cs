@@ -20,5 +20,8 @@ internal static class AutoRetainerIPC
     [EzIPC]
     internal static readonly Action EnableMultiMode;
 
+    [EzIPC]
+    internal static readonly Func<bool> GetMultiModeStatus;
+
     internal static void Dispose() => IPCSubscriber.DisposeAll(disposalTokens);
 }
