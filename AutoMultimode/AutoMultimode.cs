@@ -1,13 +1,12 @@
-﻿using Dalamud.Game.Command;
+﻿using System.Reflection;
+using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using System.IO;
-using AutoMultimode.IPC;
 using AutoMultimode.Windows;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ECommons;
-using ECommons.EzIpcManager;
+using Module = ECommons.Module;
 
 namespace AutoMultimode;
 
@@ -25,6 +24,8 @@ public sealed class AutoMultimode : IDalamudPlugin
 
     private const string CommandName = "/automultimode";
     private const string PluginName = "Auto Multimode";
+
+    public readonly string Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
 
     private ConfigWindow ConfigWindow { get; init; }
     private InformationWindow InformationWindow { get; init; }

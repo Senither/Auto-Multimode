@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
@@ -9,7 +7,7 @@ namespace AutoMultimode.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
-    private Configuration Configuration;
+    private AutoMultimode Plugin;
 
     public ConfigWindow(AutoMultimode plugin) : base("AutoMultimode Settings###settings-window")
     {
@@ -17,20 +15,35 @@ public class ConfigWindow : Window, IDisposable
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
 
-        Size = new Vector2(460, 140);
+        Size = new Vector2(460, 165);
 
-        Configuration = plugin.Configuration;
+        Plugin = plugin;
     }
 
     public void Dispose() { }
 
     public override void Draw()
     {
+        if (ImGui.BeginTabBar("##ConfigTabBar"))
+        {
+            General();
+
+            About();
+        }
+
+        ImGui.EndTabBar();
+    }
+
+    private void General()
+    {
+        if (!ImGui.BeginTabItem("General"))
+            return;
+
         ImGui.TextWrapped(
             "Set the time that should elapse without player activity before your character is marked as AFK and MultiMode is enabled."
         );
 
-        var afkTimer = (int)Configuration.EnforcedAfkTimer;
+        var afkTimer = (int)Plugin.Configuration.EnforcedAfkTimer;
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -44,29 +57,42 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.TableNextColumn();
         if (ImGui.RadioButton("5 Minutes", afkTimer == 1))
-        {
             SaveEnforcedAfkTimerToConfiguration(1);
-        }
 
         ImGui.TableNextColumn();
         if (ImGui.RadioButton("10 Minutes", afkTimer == 2))
-        {
             SaveEnforcedAfkTimerToConfiguration(2);
-        }
 
         ImGui.TableNextColumn();
         if (ImGui.RadioButton("30 Minutes", afkTimer == 3))
-        {
             SaveEnforcedAfkTimerToConfiguration(3);
-        }
 
         ImGui.TableNextColumn();
         if (ImGui.RadioButton("1 Hour", afkTimer == 4))
-        {
             SaveEnforcedAfkTimerToConfiguration(4);
-        }
 
         ImGui.EndTable();
+        ImGui.EndTabItem();
+    }
+
+    private void About()
+    {
+        if (!ImGui.BeginTabItem("About"))
+            return;
+
+        ImGui.TextUnformatted("Author:");
+        ImGui.SameLine();
+        ImGui.TextColored(ImGuiColors.ParsedGold, "Senither");
+
+        ImGui.TextUnformatted("Discord:");
+        ImGui.SameLine();
+        ImGui.TextColored(ImGuiColors.ParsedGold, "@senither");
+
+        ImGui.TextUnformatted("Version:");
+        ImGui.SameLine();
+        ImGui.TextColored(ImGuiColors.ParsedOrange, Plugin.Version);
+
+        ImGui.EndTabItem();
     }
 
     private void RenderCurrentAfkTimerValue(int value)
@@ -106,7 +132,7 @@ public class ConfigWindow : Window, IDisposable
 
     private void SaveEnforcedAfkTimerToConfiguration(uint value)
     {
-        Configuration.EnforcedAfkTimer = value;
-        Configuration.Save();
+        Plugin.Configuration.EnforcedAfkTimer = value;
+        Plugin.Configuration.Save();
     }
 }
