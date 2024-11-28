@@ -2,7 +2,7 @@
     "Author": "Senither",
     "Name": "Auto MultiMode",
     "Punchline": "Keep retainers running, even while you're away",
-    "Description": "Automatically enables Auto Retainer's multi mode after awhile of inactivity, you can change the settings using /automultimode.",
+    "Description": "Automatically enables Auto Retainer's multi mode after awhile of inactivity, you can change the settings using /automultimode or /amm.",
     "ApplicableVersion": "any",
     "Tags": [
         "auto",
