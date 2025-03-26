@@ -2,7 +2,7 @@
   "Author": "Senither",
   "Name": "Auto MultiMode",
   "InternalName": "AutoMultimode",
-  "AssemblyVersion": "1.0.0.0",
+  "AssemblyVersion": "1.1.0.0",
   "Description": "Automatically enables Auto Retainer's multi mode after awhile of inactivity, you can change the settings using /automultimode or /amm.",
   "ApplicableVersion": "any",
   "Tags": [
@@ -13,7 +13,7 @@
   "CategoryTags": [
     "Utility"
   ],
-  "DalamudApiLevel": 11,
+  "DalamudApiLevel": 12,
   "LoadRequiredState": 0,
   "LoadSync": false,
   "CanUnloadAsync": false,
