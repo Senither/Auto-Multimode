@@ -8,8 +8,11 @@
         "resolved": "12.0.0",
         "contentHash": "J5TJLV3f16T/E2H2P17ClWjtfEBPpq3yxvqW46eN36JCm6wR+EaoaYkqG9Rm5sHqs3/nK/vKjWWyvEs/jhKoXw=="
       },
-      "ecommons": {
-        "type": "Project"
+      "ECommons": {
+        "type": "Direct",
+        "requested": "[3.0.1.6, )",
+        "resolved": "3.0.1.6",
+        "contentHash": "WuUOhEoBAok5NVU2CPnnioQUd7ofjIEC8SMNOhWy9+rFPo11JcnlD2LpJi+n2z5PqXKpK7CaiURg2oPgi1Ci0A=="
       }
     }
   }
