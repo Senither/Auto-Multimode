@@ -1,4 +1,5 @@
-﻿using AutoMultimode.IPC;
+﻿using System.Collections.Generic;
+using AutoMultimode.IPC;
 using ECommons;
 using ECommons.Logging;
 

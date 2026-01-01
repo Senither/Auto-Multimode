@@ -1,4 +1,5 @@
-﻿using ECommons.EzIpcManager;
+﻿using System;
+using ECommons.EzIpcManager;
 using ECommons.Reflection;
 
 namespace AutoMultimode.IPC;
