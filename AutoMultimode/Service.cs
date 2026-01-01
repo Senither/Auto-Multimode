@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
@@ -11,10 +10,7 @@ public class Service
     public static void Initialize(IDalamudPluginInterface pluginInterface) => pluginInterface.Create<Service>();
 
     [PluginService]
-    public static IChatGui Chat { get; private set; } = null!;
-
-    [PluginService]
-    public static IClientState ClientState { get; private set; } = null!;
+    public static IObjectTable ObjectTable { get; private set; } = null!;
 
     [PluginService]
     public static IFramework Framework { get; private set; } = null!;

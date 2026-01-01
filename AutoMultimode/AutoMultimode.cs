@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
+using AutoMultimode.Windows;
 using Dalamud.Game.Command;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using AutoMultimode.Windows;
-using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using ECommons;
 using Module = ECommons.Module;
@@ -42,7 +42,7 @@ public sealed class AutoMultimode : IDalamudPlugin
 
         Service.Initialize(pluginInterface);
 
-        FrameworkListener = new(this);
+        FrameworkListener = new FrameworkListener(this);
 
         ConfigWindow = new ConfigWindow(this);
         InformationWindow = new InformationWindow(this);
@@ -66,6 +66,10 @@ public sealed class AutoMultimode : IDalamudPlugin
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
+
+#if DEBUG
+        ToggleConfigUI();
+#endif
     }
 
     public void Dispose()

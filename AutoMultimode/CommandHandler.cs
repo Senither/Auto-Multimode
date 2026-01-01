@@ -4,41 +4,30 @@ using ECommons.Logging;
 
 namespace AutoMultimode;
 
-public class CommandHandler
+public class CommandHandler(AutoMultimode plugin)
 {
-    private AutoMultimode Plugin;
-
-    public CommandHandler(AutoMultimode plugin)
-    {
-        Plugin = plugin;
-    }
-
     public void HandleCommand(string[] args)
     {
         if (args.Length == 0)
         {
-            Plugin.ToggleMainUI();
+            plugin.ToggleMainUI();
             return;
         }
 
         if (args[0].EqualsIgnoreCaseAny(new List<string> { "config", "cfg", "c" }))
         {
-            Plugin.ToggleConfigUI();
+            plugin.ToggleConfigUI();
             return;
         }
 
         if (args[0].EqualsIgnoreCaseAny(new List<string> { "status", "sta", "s" }))
         {
-            string status = AutoRetainerIPC.IsEnabled ? "Enabled" : "Disabled";
+            var autoRetainerStatus = AutoRetainerIPC.IsEnabled ? "Enabled" : "Disabled";
+            var pluginStatus = plugin.Configuration.Enabled ? "Enabled" : "Disabled";
 
-            DuoLog.Information("AutoRetainer status:                 " + status);
-            DuoLog.Information("AutoMultiMode AFK timer:   " + Plugin.Configuration.GetEnforcedAfkTimerString());
-            return;
-        }
-
-        if (args[0].EqualsIgnoreCaseAny(new List<string> { "debug", "d" }))
-        {
-            AutoMultimode.PluginInterface.OpenDeveloperMenu();
+            DuoLog.Information($"AutoRetainer status:                 {autoRetainerStatus}");
+            DuoLog.Information($"AutoMultiMode AFK status:   {pluginStatus}");
+            DuoLog.Information($"AutoMultiMode AFK time:     {plugin.Configuration.EnforcedAfkTime}m");
             return;
         }
 
@@ -46,6 +35,5 @@ public class CommandHandler
         DuoLog.Warning("Options:");
         DuoLog.Warning(" - config / cfg / c");
         DuoLog.Warning(" - status / sta / s");
-        DuoLog.Warning(" - debug / d");
     }
 }

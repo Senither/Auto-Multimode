@@ -1,54 +1,93 @@
-﻿using System;
+﻿using System.Numerics;
 using AutoMultimode.IPC;
-using Dalamud.Game.Config;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.System.String;
-using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Client.UI.Shell;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoMultimode;
 
-public class FrameworkListener
+public class FrameworkListener(AutoMultimode plugin)
 {
-    protected Configuration Configuration;
+    private DateTime? lastActiveAt;
+    private Vector3 lastPlayerPosition;
+    private float lastPlayerRotation;
 
-    private long enforceUpdateStateAt = 0;
-
-    public FrameworkListener(AutoMultimode plugin)
-    {
-        Configuration = plugin.Configuration;
-    }
+    private const float PositionThreshold = 0.1f;
+    private const float RotationThreshold = 0.01f;
 
     public void OnFrameworkUpdate(IFramework _)
     {
-        if (!AutoRetainerIPC.IsEnabled)
+        if (!plugin.Configuration.Enabled || !AutoRetainerIPC.IsEnabled)
+            return;
+
+        var player = Service.ObjectTable.LocalPlayer;
+        if (player == null || AutoRetainerIPC.GetMultiModeStatus())
         {
+            lastActiveAt = null;
             return;
         }
 
-        HandleEnablingAutoRetainerMultiMode();
-        HandleEnablingAutoAfkSwitchingTimerSetting();
+        lastActiveAt ??= DateTime.UtcNow;
+
+        if (IsPlayerActive(player))
+            lastActiveAt = DateTime.UtcNow;
+
+        if ((DateTime.UtcNow - lastActiveAt).Value.Minutes >= plugin.Configuration.EnforcedAfkTime)
+            EnableAutoRetainerMultiMode();
     }
 
-    protected void HandleEnablingAutoRetainerMultiMode()
+    protected bool IsPlayerActive(IPlayerCharacter player)
     {
-        var player = Service.ClientState.LocalPlayer;
-        if (player == null) return;
+        var pos = player.Position;
+        var rot = player.Rotation;
 
-        var playerStatus = player.OnlineStatus.Value.RowId;
-
-        // Player status of 17 represents the player being AFK
-        if (playerStatus != 17)
+        // Player movement/rotations
+        var dist = Vector3.Distance(pos, lastPlayerPosition);
+        if (dist > PositionThreshold || Math.Abs(rot - lastPlayerRotation) > RotationThreshold)
         {
-            return;
+            lastPlayerPosition = pos;
+            lastPlayerRotation = rot;
+
+            return true;
         }
 
-        if (AutoRetainerIPC.GetMultiModeStatus.Invoke())
+        // Casting/actions
+        if (player.IsCasting)
+            return true;
+
+        // Other statuses (crafting, gathering, combat, etc.)
+        if (player.StatusFlags is not (StatusFlags.None or StatusFlags.WeaponOut))
+            return true;
+
+        // Check if player is crafting
+        try
         {
-            return;
+            unsafe
+            {
+                var atkStage = AtkStage.Instance();
+                if (atkStage != null)
+                {
+                    var synthesisAddon = atkStage->RaptureAtkUnitManager->GetAddonByName("Synthesis", 1);
+                    if (synthesisAddon != null && synthesisAddon->IsVisible)
+                        return true;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // ignored
         }
 
-        if (AutoRetainerIPC.IsBusy.Invoke())
+        return false;
+    }
+
+    protected static void EnableAutoRetainerMultiMode()
+    {
+        if (AutoRetainerIPC.GetMultiModeStatus())
+            return;
+
+        if (AutoRetainerIPC.IsBusy())
         {
             Service.PrintDebug(
                 "Attempted to enable AutoRetainer MultiMode due to player state being AFK but AutoRetainer is busy"
@@ -56,47 +95,7 @@ public class FrameworkListener
             return;
         }
 
-        Service.PrintDebug("Enabling AutoRetainer MultiMode due to player state being AFK");
-        Service.GameConfig.Set(
-            option: SystemConfigOption.AutoAfkSwitchingTime,
-            value: 0
-        );
-        AutoRetainerIPC.EnableMultiMode.Invoke();
-    }
-
-    protected void HandleEnablingAutoAfkSwitchingTimerSetting()
-    {
-        if (!Service.ClientState.IsLoggedIn)
-        {
-            return;
-        }
-
-        Service.GameConfig.TryGet(SystemConfigOption.AutoAfkSwitchingTime, out uint afkTime);
-        if (afkTime == Configuration.EnforcedAfkTimer)
-        {
-            return;
-        }
-
-        if (AutoRetainerIPC.GetMultiModeStatus.Invoke())
-        {
-            return;
-        }
-
-        var unixNow = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        if (AutoRetainerIPC.IsBusy.Invoke())
-        {
-            enforceUpdateStateAt = unixNow + 1;
-            return;
-        }
-
-        if (enforceUpdateStateAt > unixNow)
-        {
-            return;
-        }
-
-        Service.GameConfig.Set(
-            option: SystemConfigOption.AutoAfkSwitchingTime,
-            value: Configuration.EnforcedAfkTimer
-        );
+        Service.PrintDebug("Enabling AutoRetainer MultiMode");
+        AutoRetainerIPC.EnableMultiMode();
     }
 }

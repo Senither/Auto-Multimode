@@ -2,12 +2,13 @@
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
+using ECommons.ImGuiMethods;
 
 namespace AutoMultimode.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
-    private AutoMultimode Plugin;
+    private readonly AutoMultimode plugin;
 
     public ConfigWindow(AutoMultimode plugin) : base("AutoMultimode Settings###settings-window")
     {
@@ -15,12 +16,17 @@ public class ConfigWindow : Window, IDisposable
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
 
-        Size = new Vector2(460, 165);
+        Size = new Vector2(460, 190);
 
-        Plugin = plugin;
+        this.plugin = plugin;
     }
 
     public void Dispose() { }
+
+    public override void OnClose()
+    {
+        plugin.Configuration.Save();
+    }
 
     public override void Draw()
     {
@@ -43,35 +49,30 @@ public class ConfigWindow : Window, IDisposable
             "Set the time that should elapse without player activity before your character is marked as AFK and MultiMode is enabled."
         );
 
-        var afkTimer = (int)Plugin.Configuration.EnforcedAfkTimer;
-
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
 
-        ImGui.Text("Current value:");
-        ImGui.SameLine();
-        RenderCurrentAfkTimerValue(afkTimer);
+        var configurationEnabled = plugin.Configuration.Enabled;
+        if (ImGui.Checkbox("Enabled###stuff", ref configurationEnabled))
+        {
+            plugin.Configuration.Enabled = configurationEnabled;
+        }
 
-        ImGui.BeginTable("afk-timer", 4);
+        if (!configurationEnabled)
+            ImGui.BeginDisabled();
 
-        ImGui.TableNextColumn();
-        if (ImGui.RadioButton("5 Minutes", afkTimer == 1))
-            SaveEnforcedAfkTimerToConfiguration(1);
+        ImGui.Text("AFK Timer in minutes");
 
-        ImGui.TableNextColumn();
-        if (ImGui.RadioButton("10 Minutes", afkTimer == 2))
-            SaveEnforcedAfkTimerToConfiguration(2);
+        var time = plugin.Configuration.EnforcedAfkTime;
+        if (ImGuiEx.SliderInt("###afk-time-int-slider", ref time, 1, 60))
+        {
+            plugin.Configuration.EnforcedAfkTime = time;
+        }
 
-        ImGui.TableNextColumn();
-        if (ImGui.RadioButton("30 Minutes", afkTimer == 3))
-            SaveEnforcedAfkTimerToConfiguration(3);
+        if (!configurationEnabled)
+            ImGui.EndDisabled();
 
-        ImGui.TableNextColumn();
-        if (ImGui.RadioButton("1 Hour", afkTimer == 4))
-            SaveEnforcedAfkTimerToConfiguration(4);
-
-        ImGui.EndTable();
         ImGui.EndTabItem();
     }
 
@@ -90,49 +91,8 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.TextUnformatted("Version:");
         ImGui.SameLine();
-        ImGui.TextColored(ImGuiColors.ParsedOrange, Plugin.Version);
+        ImGui.TextColored(ImGuiColors.ParsedOrange, plugin.Version);
 
         ImGui.EndTabItem();
-    }
-
-    private void RenderCurrentAfkTimerValue(int value)
-    {
-        Vector4 color;
-        string text = "OFF";
-
-        switch (value)
-        {
-            case 1:
-                color = ImGuiColors.ParsedGreen;
-                text = "5 Minutes";
-                break;
-
-            case 2:
-                color = ImGuiColors.HealerGreen;
-                text = "10 Minutes";
-                break;
-
-            case 3:
-                color = ImGuiColors.DalamudYellow;
-                text = "30 Minutes";
-                break;
-
-            case 4:
-                color = ImGuiColors.ParsedOrange;
-                text = "1 Hour";
-                break;
-
-            default:
-                color = ImGuiColors.DalamudOrange;
-                break;
-        }
-
-        ImGui.TextColored(color, text);
-    }
-
-    private void SaveEnforcedAfkTimerToConfiguration(uint value)
-    {
-        Plugin.Configuration.EnforcedAfkTimer = value;
-        Plugin.Configuration.Save();
     }
 }

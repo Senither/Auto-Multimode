@@ -1,13 +1,9 @@
-﻿using System;
-using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using AutoMultimode.IPC;
-using Dalamud.Interface.Colors;
-using Dalamud.Interface.Internal;
-using Dalamud.Interface.Utility;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Colors;
+using Dalamud.Interface.Windowing;
+using Dalamud.Utility;
 
 namespace AutoMultimode.Windows;
 
@@ -62,7 +58,7 @@ public class InformationWindow : Window, IDisposable
 
         ImGui.PushStyleColor(ImGuiCol.Button, ImGuiColors.ParsedBlue);
         if (ImGui.Button("Open Repository"))
-            Dalamud.Utility.Util.OpenLink("https://github.com/Senither/Auto-Multimode");
+            Util.OpenLink("https://github.com/Senither/Auto-Multimode");
 
         ImGui.PopStyleColor();
     }
