@@ -85,7 +85,8 @@ public sealed class AutoMultimode : IDalamudPlugin
 
     private void OnCommand(string command, string args)
     {
-        CommandHandler.HandleCommand(args.Split(' '));
+        CommandHandler.HandleCommand(
+            args.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
     }
 
     private void DrawUI() => WindowSystem.Draw();
