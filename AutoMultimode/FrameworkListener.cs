@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using AutoMultimode.IPC;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -61,21 +61,37 @@ public class FrameworkListener(AutoMultimode plugin)
         if (player.StatusFlags is not (StatusFlags.None or StatusFlags.WeaponOut))
             return true;
 
+        // Duty activity
         if (Service.DutyState.IsDutyStarted)
             return true;
 
-        // Check if player is crafting
         try
         {
             unsafe
             {
                 var atkStage = AtkStage.Instance();
-                if (atkStage != null)
-                {
-                    var synthesisAddon = atkStage->RaptureAtkUnitManager->GetAddonByName("Synthesis", 1);
-                    if (synthesisAddon != null && synthesisAddon->IsVisible)
-                        return true;
-                }
+                if (atkStage == null)
+                    return false;
+
+                var unitManager = atkStage->RaptureAtkUnitManager;
+
+                // Checks crafting status
+                var synthesisAddon = unitManager->GetAddonByName("Synthesis", 1);
+                if (synthesisAddon != null && synthesisAddon->IsVisible)
+                    return true;
+
+                // Checks retainer interactions 
+                var retainerList = unitManager->GetAddonByName("RetainerList", 1);
+                if (retainerList != null && retainerList->IsVisible)
+                    return true;
+
+                var retainerSellList = unitManager->GetAddonByName("RetainerSellList", 1);
+                if (retainerSellList != null && retainerSellList->IsVisible)
+                    return true;
+
+                var retainerHistory = unitManager->GetAddonByName("RetainerHistory", 1);
+                if (retainerHistory != null && retainerHistory->IsVisible)
+                    return true;
             }
         }
         catch (Exception)
