@@ -5,7 +5,9 @@ namespace AutoMultimode;
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
-    public int Version { get; set; } = 1;
+    public const int ConfigVersion = 1;
+
+    public int Version { get; set; } = ConfigVersion;
 
     public bool Enabled { get; set; } = true;
     public int EnforcedAfkTime { get; set; } = 5;

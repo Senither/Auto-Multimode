@@ -67,8 +67,14 @@ public sealed class AutoMultimode : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
 
+        if (Configuration.ConfigVersion != Configuration.Version)
+        {
+            ToggleConfigUI();
+            Configuration.Version = Configuration.ConfigVersion;
+        }
+
 #if DEBUG
-        ToggleConfigUI();
+        ConfigWindow.IsOpen = true;
 #endif
     }
 
