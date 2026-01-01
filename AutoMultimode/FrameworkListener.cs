@@ -60,6 +60,9 @@ public class FrameworkListener(AutoMultimode plugin)
         if (player.StatusFlags is not (StatusFlags.None or StatusFlags.WeaponOut))
             return true;
 
+        if (Service.DutyState.IsDutyStarted)
+            return true;
+
         // Check if player is crafting
         try
         {

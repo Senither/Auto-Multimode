@@ -19,7 +19,7 @@ public class Service
     public static IPluginLog PluginLog { get; private set; } = null!;
 
     [PluginService]
-    public static IGameConfig GameConfig { get; private set; } = null!;
+    public static IDutyState DutyState { get; private set; } = null!;
 
     public static readonly Queue LogMessages = new();
     private const int MaxLogSize = 50;
