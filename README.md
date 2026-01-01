@@ -2,7 +2,7 @@
 
 Auto Multimode is a plugin for Dalamud that will automatically enable [AutoRetainer's](https://github.com/PunishXIV/AutoRetainer) multi mode when it's detected that a player is AFK.
 
-It allows you to set a custom AFK time of between 5, 10, 30, and 60 minutes, after which the plugin will automatically enable multi mode. This is useful for players who are AFK for long periods of time and want to ensure that their retainers are still able to bring in items.
+It allows you to set a custom AFK time of between 1 and 60 minutes, after which the plugin will automatically enable multi mode. This is useful for players who are AFK for long periods of time and want to ensure that their retainers are still able to bring in items.
 
 ## Installation
 
