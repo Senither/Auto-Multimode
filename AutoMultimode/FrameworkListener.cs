@@ -13,6 +13,7 @@ public class FrameworkListener(AutoMultimode plugin)
     private DateTime? lastActiveAt;
     private Vector3 lastPlayerPosition;
     private float lastPlayerRotation;
+    private ulong lastPlayerTargetId;
 
     private const float PositionThreshold = 0.1f;
     private const float RotationThreshold = 0.01f;
@@ -50,6 +51,13 @@ public class FrameworkListener(AutoMultimode plugin)
             lastPlayerPosition = pos;
             lastPlayerRotation = rot;
 
+            return true;
+        }
+
+        // Player targets
+        if (player.TargetObjectId != lastPlayerTargetId)
+        {
+            lastPlayerTargetId = player.TargetObjectId;
             return true;
         }
 
