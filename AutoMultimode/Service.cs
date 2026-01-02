@@ -10,10 +10,13 @@ public class Service
     public static void Initialize(IDalamudPluginInterface pluginInterface) => pluginInterface.Create<Service>();
 
     [PluginService]
-    public static IObjectTable ObjectTable { get; private set; } = null!;
+    public static IFramework Framework { get; private set; } = null!;
 
     [PluginService]
-    public static IFramework Framework { get; private set; } = null!;
+    public static IChatGui ChatGui { get; private set; } = null!;
+
+    [PluginService]
+    public static IObjectTable ObjectTable { get; private set; } = null!;
 
     [PluginService]
     public static IPluginLog PluginLog { get; private set; } = null!;

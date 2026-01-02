@@ -32,7 +32,7 @@ public sealed class AutoMultimode : IDalamudPlugin
 
     private ConfigWindow ConfigWindow { get; init; }
     private InformationWindow InformationWindow { get; init; }
-    private FrameworkListener FrameworkListener { get; init; }
+    private ActivityListener ActivityListener { get; init; }
 
     public AutoMultimode(IDalamudPluginInterface pluginInterface)
     {
@@ -43,7 +43,7 @@ public sealed class AutoMultimode : IDalamudPlugin
 
         Service.Initialize(pluginInterface);
 
-        FrameworkListener = new FrameworkListener(this);
+        ActivityListener = new ActivityListener(this);
 
         ConfigWindow = new ConfigWindow(this);
         InformationWindow = new InformationWindow(this);
@@ -62,7 +62,8 @@ public sealed class AutoMultimode : IDalamudPlugin
             ShowInHelp = false,
         });
 
-        Service.Framework.Update += FrameworkListener.OnFrameworkUpdate;
+        Service.ChatGui.ChatMessage += ActivityListener.OnChatMessage;
+        Service.Framework.Update += ActivityListener.OnFrameworkUpdate;
 
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
@@ -83,6 +84,9 @@ public sealed class AutoMultimode : IDalamudPlugin
     {
         WindowSystem.RemoveAllWindows();
         InformationWindow.Dispose();
+
+        Service.ChatGui.ChatMessage -= ActivityListener.OnChatMessage;
+        Service.Framework.Update -= ActivityListener.OnFrameworkUpdate;
 
         ECommonsMain.Dispose();
 

@@ -1,14 +1,16 @@
-using System;
+﻿using System;
 using System.Numerics;
 using AutoMultimode.IPC;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace AutoMultimode;
 
-public class FrameworkListener(AutoMultimode plugin)
+public class ActivityListener(AutoMultimode plugin)
 {
     private DateTime? lastActiveAt;
     private Vector3 lastPlayerPosition;
@@ -17,6 +19,23 @@ public class FrameworkListener(AutoMultimode plugin)
 
     private const float PositionThreshold = 0.1f;
     private const float RotationThreshold = 0.01f;
+
+    public void OnChatMessage(XivChatType type, int ts, ref SeString sender, ref SeString message, ref bool isHandled)
+    {
+        if (lastActiveAt == null)
+            return;
+
+        var player = Service.ObjectTable.LocalPlayer;
+        if (player == null)
+            return;
+
+        var isChatActivity = type == XivChatType.TellOutgoing // Outgoing whispers
+                             || type == (XivChatType)2091     // Battle log "You use [action]"
+                             || sender.TextValue.Equals(player.Name.TextValue, StringComparison.OrdinalIgnoreCase);
+
+        if (isChatActivity)
+            lastActiveAt = DateTime.UtcNow;
+    }
 
     public void OnFrameworkUpdate(IFramework _)
     {
