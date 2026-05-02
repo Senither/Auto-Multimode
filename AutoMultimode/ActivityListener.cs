@@ -31,8 +31,7 @@ public class ActivityListener(AutoMultimode plugin)
         if (player == null)
             return;
 
-        var isChatActivity = message.LogKind is XivChatType.Action or XivChatType.TellOutgoing;
-
+        var isChatActivity = message.LogKind == XivChatType.TellOutgoing || message is { LogKind: XivChatType.Action, SourceKind: XivChatRelationKind.LocalPlayer };
         if (isChatActivity)
             lastActiveAt = DateTime.UtcNow;
     }
